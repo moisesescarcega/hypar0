@@ -25,35 +25,64 @@ function Hypar(props) {
     )
 }
 
-function HyparRuled(props) {
-    const dimension = 10
-    const shape = useMemo(() => {
-        const shape = new THREE.Shape()
-        const halfDimension = dimension / 2
-        for (let x = -halfDimension; x <= halfDimension; x += 0.5) {
-            for (let y = -halfDimension; y <= halfDimension; y += 0.5) {
-                const z = (x * x - y * y) / (dimension * dimension)
-                shape.lineTo(x, y, z)
-            }
-        }
-    })
-    return (
-        <mesh castShadow receiveShadow geometry={shape} {...props} >
-            <meshStandardMaterial color={0x0000ff} wireframe />
-        </mesh>
-    )
-}
+// function SimpleLine() {
+//     const vertices = []
+//         vertices.push(new THREE.Vector3(5, 0, 0))
+//         vertices.push(new THREE.Vector3(0, 0, 5))
+//     const linea = new THREE.BufferGeometry().setFromPoints(vertices)
+//     return (
+//         <line geometry={linea}>
+//             <lineBasicMaterial attach="material" color={0x0000ff} linewidth={2} />
+//         </line>
+//     )
+// }
 
-function SimpleLine() {
-    const vertices = []
-        vertices.push(new THREE.Vector3(5, 0, 0))
-        vertices.push(new THREE.Vector3(0, 0, 5))
-    const linea = new THREE.BufferGeometry().setFromPoints(vertices)
+const segmentos = 28;
+const vAx = -5, vAy = 7, vAz = 0;
+const vBx = 0, vBy = -7, vBz = 5;
+const vCx = 5, vCy = 7, vCz = 0;
+const vDx = 0, vDy = -7, vDz = -5;
+
+function Ruled0() {
+    const lineas = [];
+
+    // Crear líneas rectas para cada segmento
+    for (let n = 1; n <= segmentos; n++) {
+        const xA = ((vAx - vBx) / segmentos) * n; //-1.25  -2.50  -3.75  -5.00
+        const yA = ((vBy / (segmentos / 2)) * ((segmentos - (segmentos / 2)) - n)); //-3.50  
+        const zA = ((vAz - vBz) / segmentos) * (segmentos - n);
+
+        const xC = ((vCx - vDx) / segmentos) * (segmentos - n); //5.00  3.75  2.50  1.25
+        const yC = ((vCy / (segmentos / 2)) * ((segmentos - (segmentos / 2)) - n));
+        const zC = ((vCz - vDz) / segmentos) * n;
+
+        // Definir puntos para la línea actual
+        const puntos = [];
+        const puntoUno = new THREE.Vector3(xA, yA, zA);
+        const puntoDos = new THREE.Vector3(xC, yC, zC);
+        puntos.push(puntoUno)
+        puntos.push(puntoDos)
+
+        // Crear geometría de la línea
+        const lineaDirectriz = new THREE.BufferGeometry().setFromPoints(puntos);
+
+        // Agregar línea al array
+        lineas.push(
+            lineaDirectriz
+        );
+    }
+
     return (
-        <line geometry={linea}>
-            <lineBasicMaterial attach="material" color={0x0000ff} linewidth={2} />
-        </line>
-    )
+        <>
+            {
+                lineas.map((linea, index) => (
+                    <line key={index} geometry={linea}>
+                        <lineBasicMaterial attach='material' color={0x0000ff} linewidth={1} />
+                    </line>
+                ))
+            }
+        </>
+    );
 }
 
 export const Canvasapp = () => {
@@ -61,8 +90,9 @@ export const Canvasapp = () => {
         <Canvas camera={{ position: [-15, 12.5, 15], fov: 35 }}>
         <ambientLight intensity={Math.PI / 8} />
         <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
-        <Hypar position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} />
-        {/* <SimpleLine /> */}
+        {/* <Hypar position={[0, 0, 0]} rotation={[THREE.MathUtils.degToRad(45), 0, 0]} /> */}
+        <gridHelper args={[20, 20, 0xff0000, 'teal']} />
+        <Ruled0 />
         <OrbitControls makeDefault dampingFactor={0.3} />
         <Environment preset="sunset" />
         </Canvas>
