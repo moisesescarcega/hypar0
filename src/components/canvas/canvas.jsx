@@ -1,105 +1,89 @@
-import { useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, Shape } from "@react-three/drei";
-import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
-import * as THREE from 'three';
+import { useRef, useState } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, Environment, Html } from '@react-three/drei'
+import * as THREE from 'three'
 
-function Hypar(props) {
-    const [hovered, hover] = useState(false)
-    const a = 1
-    const b = 1
-    const parabHiper = new ParametricGeometry(
-        (u, v, target) => {
-        const x = (u - 0.5) * 5 // Escala u para que vaya de -5 a 5
-        const y = (v - 0.5) * 5 // Escala v para que vaya de -5 a 5
-        const z = (x * x) / (a * a) - (y * y) / (b * b) // Ecuación del paraboloide hiperbólico
-        target.set(x, y, z)
-        },
-        50,
-        50
-    )
-    return (
-        <mesh castShadow receiveShadow geometry={parabHiper} {...props}>
-        <meshStandardMaterial color={0x0000ff} side={THREE.DoubleSide} />
-        </mesh>
-    )
+const segmentos = 128
+const vAx = -5; const vAy = 7; const vAz = 0
+const vBx = 0; const vBy = -7; const vBz = 5
+const vCx = 5; const vCy = 7; const vCz = 0
+const vDx = 0; const vDy = -7; const vDz = -5
+
+function CuatroVertices () {
+  const rVertices = useRef()
+  return (
+    <>
+      <points ref={rVertices} rotation-y={THREE.MathUtils.degToRad(45)}>
+        <boxGeometry args={[7.071, 14, 7.071]} />
+        <pointsMaterial attach='material' color={0x000066} size={0.2} />
+      </points>
+    </>
+  )
 }
 
-const segmentos = 128;
-const vAx = -5, vAy = 7, vAz = 0;
-const vBx = 0, vBy = -7, vBz = 5;
-const vCx = 5, vCy = 7, vCz = 0;
-const vDx = 0, vDy = -7, vDz = -5;
+function Ruled0 ({seg}) {
+  const lineas = []
 
-function CuatroVertices() {
-    const rVertices = useRef()
-    return (
-        <>
-            <points ref={rVertices} rotation-y={THREE.MathUtils.degToRad(45)} >
-                <boxGeometry args={[7.071, 14, 7.071]} />
-                {/* <bufferGeometry /> */}
-                <pointsMaterial attach='material' color={0x000066} size={1} />
-            </points>
-        </>
-    )
-}
+  // Crear líneas rectas para cada segmento
+  for (let n = 1; n <= seg; n++) {
+    const xA = ((vAx - vBx) / seg) * n
+    const yA = (((2 * vBy) / seg) * ((seg - (seg / 2)) - n))
+    const zA = ((vAz - vBz) / seg) * (seg - n)
 
-function Ruled0() {
-    const lineas = [];
+    const xC = ((vCx - vDx) / seg) * (seg - n)
+    const yC = ((vCy / (seg / 2)) * ((seg - (seg / 2)) - n))
+    const zC = ((vCz - vDz) / seg) * n
 
-    // Crear líneas rectas para cada segmento
-    for (let n = 1; n <= segmentos; n++) {
-        const xA = ((vAx - vBx) / segmentos) * n; 
-        const yA = (((2 * vBy) / segmentos) * ((segmentos - (segmentos / 2)) - n));   
-        const zA = ((vAz - vBz) / segmentos) * (segmentos - n);
+    // Definir puntos para la línea actual
+    const puntoUno = new THREE.Vector3(xA, yA, zA)
+    const puntoDos = new THREE.Vector3(xC, yC, zC)
+    const puntoInicialUno = new THREE.Vector3(vCx, vCy, vCz)
+    const puntoInicialDos = new THREE.Vector3(vDx, vDy, vDz)
+    const puntos = [puntoUno, puntoDos]
+    const puntosIniciales = [puntoInicialUno, puntoInicialDos]
 
-        const xC = ((vCx - vDx) / segmentos) * (segmentos - n); 
-        const yC = ((vCy / (segmentos / 2)) * ((segmentos - (segmentos / 2)) - n));
-        const zC = ((vCz - vDz) / segmentos) * n;
+    // Crear geometría de la línea
+    const lineaDirectriz = new THREE.BufferGeometry().setFromPoints(puntos)
+    const lineaFinal = new THREE.BufferGeometry().setFromPoints(puntosIniciales)
 
-        // Definir puntos para la línea actual
-        const puntoUno = new THREE.Vector3(xA, yA, zA);
-        const puntoDos = new THREE.Vector3(xC, yC, zC);
-        const puntoInicialUno = new THREE.Vector3(vCx, vCy, vCz);
-        const puntoInicialDos = new THREE.Vector3(vDx, vDy, vDz);
-        const puntos = [puntoUno, puntoDos];
-        const puntosIniciales = [puntoInicialUno, puntoInicialDos];
-        // puntos.push(puntoUno, puntoDos)
+    // Agregar línea al array
+    lineas.push(lineaDirectriz, lineaFinal)
+  }
 
-        // Crear geometría de la línea
-        const lineaDirectriz = new THREE.BufferGeometry().setFromPoints(puntos);
-        const lineaFinal = new THREE.BufferGeometry().setFromPoints(puntosIniciales);
-
-        // Agregar línea al array
-        lineas.push(lineaDirectriz, lineaFinal);
-    }
-
-    return (
-        <>
-            {
+  return (
+    <>
+      {
                 lineas.map((linea, index) => (
-                    <line key={index} geometry={linea}>
-                        <lineBasicMaterial attach='material' color={0x0000ff} linewidth={1} />
-                    </line>
+                  <line key={index} geometry={linea}>
+                    <lineBasicMaterial attach='material' color={0x0000ff} linewidth={1} />
+                  </line>
                 ))
             }
-        </>
-    );
+    </>
+  )
 }
 
 export const Canvasapp = () => {
-    return (
-        <Canvas camera={{ position: [-15, 12.5, 15], fov: 35 }}>
-        <ambientLight intensity={Math.PI / 8} />
-        <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
-        {/* <Hypar position={[0, 0, 0]} rotation={[THREE.MathUtils.degToRad(90), 0, THREE.MathUtils.degToRad(90)]} /> */}
-        <gridHelper args={[20, 20, 0xff0000, 'teal']} />
-        <Ruled0 />
-        {/* <CuatroVertices /> */}
-        <OrbitControls makeDefault dampingFactor={0.3} />
-        <Environment preset="sunset" />
-        </Canvas>
-)
+    const [segments, setSegments] = useState(segmentos)
+    const handleChange = (e) => {
+        setSegments(e.target.value)
+    }
+  return (
+    <Canvas camera={{ position: [-15, 12.5, 15], fov: 35 }}>
+      <ambientLight intensity={Math.PI / 8} />
+      <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
+      <OrbitControls makeDefault dampingFactor={0.3} />
+      <Environment preset='sunset' />
+      <gridHelper args={[20, 20, 0xff0000, 'teal']} />
+      <Ruled0 seg={segments} />
+      <CuatroVertices />
+      <Html center>
+        <label>Segmentos: </label>
+        <input type='text' value={segments} onChange={handleChange} className='inputSegments' />
+        {/* <input id="default-range" type="range" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" style={{zIndex:9999}}></input> */}
+      </Html>
+    </Canvas>
+  )
 }
 
-export default Canvasapp;
+export default Canvasapp
