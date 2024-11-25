@@ -43,7 +43,7 @@ body {
 	line-height: 1.7;
 }
 canvas {
-	height: 88vh;
+	height: calc(100vh - 3em);
 }
 main {
 	width: 720px;

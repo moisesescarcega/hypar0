@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, Shape } from "@react-three/drei";
 import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
@@ -25,7 +25,7 @@ function Hypar(props) {
     )
 }
 
-const segmentos = 8;
+const segmentos = 128;
 const vAx = -5, vAy = 7, vAz = 0;
 const vBx = 0, vBy = -7, vBz = 5;
 const vCx = 5, vCy = 7, vCz = 0;
