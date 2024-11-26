@@ -64,25 +64,30 @@ function Ruled0 ({seg}) {
 }
 
 export const Canvasapp = () => {
-    const [segments, setSegments] = useState(segmentos)
+    const [segments, setSegments] = useState(120)
     const handleChange = (e) => {
         setSegments(e.target.value)
     }
   return (
-    <Canvas camera={{ position: [-15, 12.5, 15], fov: 35 }}>
-      <ambientLight intensity={Math.PI / 8} />
-      <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
-      <OrbitControls makeDefault dampingFactor={0.3} />
-      <Environment preset='sunset' />
-      <gridHelper args={[20, 20, 0xff0000, 'teal']} />
-      <Ruled0 seg={segments} />
-      <CuatroVertices />
-      <Html center>
-        <label>Segmentos: </label>
-        <input type='text' value={segments} onChange={handleChange} className='inputSegments' />
-        {/* <input id="default-range" type="range" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" style={{zIndex:9999}}></input> */}
-      </Html>
-    </Canvas>
+    <>
+      <div className="mx-3">
+        <label>Segmentos:&nbsp;</label>
+        <input id="default-range" type="range" value={segments} onChange={handleChange} min="3" max="200" className="h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"></input>
+        <label>{segments}</label>
+      </div>
+      <Canvas camera={{ position: [-15, 12.5, 15], fov: 35 }}>
+        <ambientLight intensity={Math.PI / 8} />
+        <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
+        <OrbitControls makeDefault dampingFactor={0.3} />
+        <Environment preset='sunset' />
+        <gridHelper args={[20, 20, 0xff0000, 'teal']} />
+        <Ruled0 seg={segments} />
+        <CuatroVertices />
+        <Html center>
+          <label>Segmentos: </label>
+        </Html>
+      </Canvas>
+    </>
   )
 }
 
