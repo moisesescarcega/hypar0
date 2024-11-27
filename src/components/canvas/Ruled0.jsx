@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-
 export function Ruled0({ seg, vertexX, vertexY, vertexZ }) {
   const lineas = [];
   const vAx = -vertexX;
