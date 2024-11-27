@@ -6,26 +6,26 @@ const MaterialSettings = {
     depthTest: false,
     colorWrite: false,
     stencilWrite: true,
-    stencilFunc: THREE.AlwaysStencilFunc,
+    stencilFunc: THREE.AlwaysStencilFunc
   },
   mat0: {
     side: THREE.BackSide,
     stencilFail: THREE.IncrementWrapStencilOp,
     stencilZFail: THREE.IncrementWrapStencilOp,
-    stencilZPass: THREE.IncrementWrapStencilOp,
+    stencilZPass: THREE.IncrementWrapStencilOp
   },
   mat1: {
     side: THREE.FrontSide,
     stencilFail: THREE.DecrementWrapStencilOp,
     stencilZFail: THREE.DecrementWrapStencilOp,
-    stencilZPass: THREE.DecrementWrapStencilOp,
+    stencilZPass: THREE.DecrementWrapStencilOp
   },
   mainMaterial: {
     color: 0xff0000,
     metalness: 0.1,
     roughness: 0.75,
     clipShadows: true,
-    shadowSide: THREE.DoubleSide,
+    shadowSide: THREE.DoubleSide
   },
   planeMaterial: {
     color: 'yellow',
@@ -35,7 +35,7 @@ const MaterialSettings = {
     stencilFunc: THREE.NotEqualStencilFunc,
     stencilFail: THREE.ReplaceStencilOp,
     stencilZFail: THREE.ReplaceStencilOp,
-    stencilZPass: THREE.ReplaceStencilOp,
-  },
+    stencilZPass: THREE.ReplaceStencilOp
+  }
 }
 export default MaterialSettings
