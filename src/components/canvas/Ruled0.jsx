@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { useMemo } from 'react'
 
-export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, cp0 }) {
+export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) {
   const lineas = []
   const vAx = -vertexX
   const vAy = vertexZ
@@ -15,7 +15,6 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, cp0 }) {
   const vDx = 0
   const vDy = -vertexZ
   const vDz = -vertexY
-  const pCp0 = cp0
 
   // Crear líneas rectas para cada segmento
   for (let n = 1; n <= seg; n++) {
@@ -43,9 +42,13 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, cp0 }) {
     lineas.push(lineaDirectriz, lineaFinal)
   }
 
-  const planeSingle = useMemo(() => {
-    return [new THREE.Plane(new THREE.Vector3(0, 0, 1), cp0)]
-  }, [cp0])
+  const planeClip = useMemo(() => {
+    return [
+      new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, 1), 0),
+      new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, -1), 0),
+      new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
+    ]
+  }, [cp0, cp1, clipping])
 
   return (
     <>
@@ -53,7 +56,7 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, cp0 }) {
         // Mostrar cada linea de cada segmento para generar la superficie reglada
         lineas.map((linea, index) => (
           <line key={index} geometry={linea}>
-            <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={planeSingle} />
+            <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={planeClip} />
           </line>
         ))
 }

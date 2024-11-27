@@ -9,7 +9,9 @@ export const Canvasapp = () => {
   const [vertX, setVertX] = useState(5)
   const [vertY, setVertY] = useState(5)
   const [vertZ, setVertZ] = useState(7)
-  const [clipPlane0, setClipPlane0] = useState(2)
+  const [clipping, setClipping] = useState('planeClip')
+  const [clipPlane0, setClipPlane0] = useState(45)
+  const [clipPlane1, setClipPlane1] = useState(3)
   const sizeGrid = vertX
   const handleSegments = (e) => {
     setSegments(e.target.value)
@@ -23,12 +25,18 @@ export const Canvasapp = () => {
   const handleZ = (e) => {
     setVertZ(e.target.value)
   }
+  const handleClipping = (e) => {
+    e.target.value === true ? setClipping('planeClip') : setClipping('null')
+  }
   const handleCP0 = (e) => {
     setClipPlane0(e.target.value)
   }
+  const handleCP1 = (e) => {
+    setClipPlane1(e.target.value)
+  }
   return (
     <div className='static'>
-      {ConfigHypar(segments, handleSegments, vertX, handleX, vertY, handleY, vertZ, handleZ, clipPlane0, handleCP0)}
+      {ConfigHypar(segments, handleSegments, vertX, handleX, vertY, handleY, vertZ, handleZ, clipPlane0, handleCP0, clipPlane1, handleCP1)}
       <Canvas camera={{ position: [-15, 12.5, 15], fov: 35 }} className='z-30' onCreated={(state) => (state.gl.localClippingEnabled = true)}>
         <Suspense fallback={<Html center>...cargando</Html>}>
           <ambientLight intensity={Math.PI / 8} />
@@ -39,7 +47,7 @@ export const Canvasapp = () => {
           {/* Rejilla de base TODO: agregar useState dentro de HandleX y HandleY para actualizar sizeGrid */}
           <gridHelper args={[(vertX > vertY ? vertX : vertY), (vertX > vertY ? vertX : vertY), 0xff0000, 'teal']} />
           {/* Componente de Hypar con los params X, Y y Z */}
-          <Ruled0 seg={segments} vertexX={vertX} vertexY={vertY} vertexZ={vertZ} cp0={clipPlane0} />
+          <Ruled0 seg={segments} vertexX={vertX} vertexY={vertY} vertexZ={vertZ} cp0={clipPlane0} cp1={clipPlane1} />
         </Suspense>
       </Canvas>
     </div>
