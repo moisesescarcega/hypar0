@@ -43,16 +43,16 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
         <label>{vertexZ}</label>
       </div>
 
-      {/* <div className='flex-row'>
+      <div className='flex-row'>
         <label>Planos de corte:&nbsp;</label>
         <input
           id='planocorte0'
           type='checkbox'
-          value={true}
+          checked={clipping}
           onChange={handleClipping}
-          className='h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
+          className='w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
         />
-      </div> */}
+      </div>
 
       <div className='flex-row'>
         <label>Plano sesgado:&nbsp;</label>
@@ -66,7 +66,7 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
           step='15'
           className='h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
         />
-        <label>{clipPlane0}</label>
+        <label>{clipPlane0}°</label>
       </div>
 
       <div className='flex-row'>
@@ -92,7 +92,7 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
           value={segments}
           onChange={handleSegments}
           min='3'
-          max='200'
+          max='300'
           className='h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
         />
         <label>{segments}</label>

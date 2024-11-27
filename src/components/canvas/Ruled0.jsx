@@ -43,11 +43,11 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
   }
 
   const planeClip = useMemo(() => {
-    return [
-      new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, 1), 0),
-      new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, -1), 0),
-      new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
-    ]
+     return [
+       new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, 1), 0),
+       new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, -1), 0),
+       new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
+     ]
   }, [cp0, cp1, clipping])
 
   return (
@@ -56,7 +56,7 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
         // Mostrar cada linea de cada segmento para generar la superficie reglada
         lineas.map((linea, index) => (
           <line key={index} geometry={linea}>
-            <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={planeClip} />
+            <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
           </line>
         ))
 }
