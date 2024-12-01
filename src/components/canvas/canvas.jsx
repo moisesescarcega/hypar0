@@ -9,7 +9,7 @@ export const Canvasapp = () => {
   const [vertX, setVertX] = useState(5)
   const [vertY, setVertY] = useState(5)
   const [vertZ, setVertZ] = useState(7)
-  const [clipping, setClipping] = useState(false)
+  const [clipping, setClipping] = useState(true)
   const [clipPlane0, setClipPlane0] = useState(45)
   const [clipPlane1, setClipPlane1] = useState(3)
   const sizeGrid = vertX

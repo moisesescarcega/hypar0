@@ -61,7 +61,7 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
           type='range'
           value={clipPlane0}
           onChange={handleCP0}
-          min='15'
+          min='0'
           max='90'
           step='15'
           className='h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'

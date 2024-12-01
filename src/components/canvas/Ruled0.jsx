@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { useMemo } from 'react'
+import { Plane } from '@react-three/drei'
 
 export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) {
   const lineas = []
@@ -43,15 +44,28 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
   }
 
   const planeClip = useMemo(() => {
-     return [
-       new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, 1), 0),
-       new THREE.Plane(new THREE.Vector3(THREE.MathUtils.degToRad(-cp0), 0, -1), 0),
-       new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
-     ]
+    // Asignando valor de ángulo de inclinación de plano de corte vertical central
+    const axis = new THREE.Vector3(0, 1, 0)
+    const angle = THREE.MathUtils.degToRad(cp0)
+    // Genera un array de planos de corte
+    return [
+      new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axis, -angle), 0),
+      new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axis, angle), 0),
+      new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
+    ]
   }, [cp0, cp1, clipping])
+  const PlaneSingle = () => {
+    return (
+
+      <Plane args={[8, 8]} rotation={[0, THREE.MathUtils.degToRad(-cp0), 0]}>
+        <meshBasicMaterial side={THREE.DoubleSide} />
+      </Plane>
+    )
+  }
 
   return (
     <>
+      <PlaneSingle />
       {
         // Mostrar cada linea de cada segmento para generar la superficie reglada
         lineas.map((linea, index) => (
@@ -59,7 +73,7 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
             <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
           </line>
         ))
-}
+      }
     </>
   )
 }
