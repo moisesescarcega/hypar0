@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { useMemo } from 'react'
-import { Plane } from '@react-three/drei'
+// import { Plane } from '@react-three/drei'
 
 export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) {
   const lineas = []
@@ -30,18 +30,21 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
     // Definir puntos para la línea actual
     const puntoUno = new THREE.Vector3(xA, yA, zA)
     const puntoDos = new THREE.Vector3(xC, yC, zC)
-    const puntoInicialUno = new THREE.Vector3(vCx, vCy, vCz)
-    const puntoInicialDos = new THREE.Vector3(vDx, vDy, vDz)
     const puntos = [puntoUno, puntoDos]
-    const puntosIniciales = [puntoInicialUno, puntoInicialDos]
-
+    
     // Crear geometría de la línea
     const lineaDirectriz = new THREE.BufferGeometry().setFromPoints(puntos)
-    const lineaFinal = new THREE.BufferGeometry().setFromPoints(puntosIniciales)
-
+    
     // Agregar línea al array
-    lineas.push(lineaDirectriz, lineaFinal)
+    // // lineaDirectriz.rotateY(THREE.MathUtils.degToRad(45))
+    lineas.push(lineaDirectriz)
   }
+  
+  const puntoInicialUno = new THREE.Vector3(vCx, vCy, vCz)
+  const puntoInicialDos = new THREE.Vector3(vDx, vDy, vDz)
+  const puntosIniciales = [puntoInicialUno, puntoInicialDos]
+  const lineaFinal = new THREE.BufferGeometry().setFromPoints(puntosIniciales)
+  const lineaFinal2 = new THREE.BufferGeometry().setFromPoints(puntosIniciales).rotateY(THREE.MathUtils.degToRad(30))
 
   const planeClip = useMemo(() => {
     // Asignando valor de ángulo de inclinación de plano de corte vertical central
@@ -54,18 +57,17 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
       new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
     ]
   }, [cp0, cp1, clipping])
-  const PlaneSingle = () => {
-    return (
+  // const PlaneSingle = () => {
+  //   return (
 
-      <Plane args={[8, 8]} rotation={[0, THREE.MathUtils.degToRad(-cp0), 0]}>
-        <meshBasicMaterial side={THREE.DoubleSide} />
-      </Plane>
-    )
-  }
+  //     <Plane args={[8, 8]} rotation={[0, THREE.MathUtils.degToRad(-cp0), 0]}>
+  //       <meshBasicMaterial side={THREE.DoubleSide} />
+  //     </Plane>
+  //   )
+  // }
 
   return (
     <>
-      <PlaneSingle />
       {
         // Mostrar cada linea de cada segmento para generar la superficie reglada
         lineas.map((linea, index) => (
@@ -74,6 +76,12 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
           </line>
         ))
       }
+      <line geometry={lineaFinal}>
+        <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
+      </line>
+      <line geometry={lineaFinal2}>
+        <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
+      </line>
     </>
   )
 }

@@ -43,7 +43,6 @@ export const Canvasapp = () => {
           <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
           <OrbitControls makeDefault dampingFactor={0.3} />
           <Environment preset='sunset' />
-          {/* <Plano /> */}
           {/* Rejilla de base TODO: agregar useState dentro de HandleX y HandleY para actualizar sizeGrid */}
           <gridHelper args={[(vertX > vertY ? vertX : vertY), (vertX > vertY ? vertX : vertY), 0xff0000, 'teal']} />
           {/* Componente de Hypar con los params X, Y y Z */}
