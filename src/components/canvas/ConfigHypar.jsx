@@ -58,7 +58,7 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
       </div>
 
       <div className='flex-row'>
-        <label>Planos de corte:&nbsp;</label>
+        <label>Mostrar hypar completo:&nbsp;</label>
         <input
           id='planocorte0'
           type='checkbox'
@@ -69,7 +69,7 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
       </div>
 
       <div className='flex-row'>
-        <label>Plano sesgado:&nbsp;</label>
+        <label>Inclinación corte:&nbsp;</label>
         <input
           id='planocorte0'
           type='range'
@@ -84,7 +84,7 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
       </div>
 
       <div className='flex-row'>
-        <label>Plano vertical:&nbsp;</label>
+        <label>Posición corte:&nbsp;</label>
         <input
           id='planocorte1'
           type='range'

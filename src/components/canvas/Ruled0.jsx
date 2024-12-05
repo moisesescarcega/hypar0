@@ -80,17 +80,33 @@ export function Ruled0({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0, 
 
     return (
       <>
-        {lineas.map((linea, index) => (
+        {
+        mostrarHypar()
+        }
+      </>
+    );
+
+    function mostrarHypar() {
+      if (clipping) {
+        return lineas.map((linea, index) => (
           <line key={index} geometry={linea.geometry}>
             <lineBasicMaterial
               color={0x0000ff}
               linewidth={1}
-              clippingPlanes={clipping ? linea.clip : null}
-            />
+              clippingPlanes={clipping ? linea.clip : null} />
           </line>
-        ))}
-      </>
-    );
+        ));
+      } else {
+        return lineas.slice(0,seg).map((linea, index) => (
+          <line key={index} geometry={linea.geometry}>
+            <lineBasicMaterial
+              color={0x0000ff}
+              linewidth={1}
+              clippingPlanes={clipping ? linea.clip : null} />
+          </line>
+        ));
+      }
+    }
   };
 
   return (

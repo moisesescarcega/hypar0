@@ -24,7 +24,7 @@ export const Canvasapp = () => {
   // Reanudar rotación después de 2 segundos de inactividad
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!rotationEnabled && Date.now() - lastInteraction > 2000) {
+      if (!rotationEnabled && Date.now() - lastInteraction > 3500) {
         setRotationEnabled(true);
       }
     }, 500);
