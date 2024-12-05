@@ -1,9 +1,7 @@
+import React, { useMemo } from 'react';
 import * as THREE from 'three';
 
 export function Ruled0({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0, cp1 }) {
-  // const mantos = 8; // Número de mantos
-  const lineas = [];
-  const planosCorte = [];
   const axisY = new THREE.Vector3(0, 1, 0);
 
   // Coordenadas base
@@ -18,29 +16,39 @@ export function Ruled0({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0, 
   const puntoInicialDos = new THREE.Vector3(vertices[3].x, vertices[3].y, vertices[3].z);
   const puntosIniciales = [puntoInicialUno, puntoInicialDos];
 
-  // Crear planos de corte para cada manto
-  const anguloPorManto = 360 / mantos;
-  const medioAnguloPorManto = 180 / mantos;
-  for (let i = 0; i < mantos; i++) {
-    const rotacion = THREE.MathUtils.degToRad((anguloPorManto * i) + medioAnguloPorManto);
-    const rotacionPlanoCorte = THREE.MathUtils.degToRad(((anguloPorManto * i) + 90) );
-    planosCorte.push({
-      nplane: i + 1,
-      cplane: [
-        new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axisY, rotacion), 0),
-        new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axisY, rotacion + THREE.MathUtils.degToRad(-anguloPorManto)), 0),
-        new THREE.Plane(
-          new THREE.Vector3(0, 0, -1)
-          .applyAxisAngle(new THREE.Vector3(-1, 0, 0), THREE.MathUtils.degToRad(-cp0))
-          .applyAxisAngle(axisY, rotacionPlanoCorte)
-          ,cp1
-        )
-      ]
-    });
-  }
+  // Generar planos de corte usando useMemo
+  const planosCorte = useMemo(() => {
+    const anguloPorManto = 360 / mantos;
+    const medioAnguloPorManto = 180 / mantos;
+    const generatedPlanes = [];
+
+    for (let i = 0; i < mantos; i++) {
+      const rotacion = THREE.MathUtils.degToRad((anguloPorManto * i) + medioAnguloPorManto);
+      const rotacionPlanoCorte = THREE.MathUtils.degToRad((anguloPorManto * i) + 90);
+
+      generatedPlanes.push({
+        nplane: i + 1,
+        cplane: [
+          new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axisY, rotacion), 0),
+          new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axisY, rotacion + THREE.MathUtils.degToRad(-anguloPorManto)), 0),
+          new THREE.Plane(
+            new THREE.Vector3(0, 0, -1)
+              .applyAxisAngle(new THREE.Vector3(-1, 0, 0), THREE.MathUtils.degToRad(-cp0))
+              .applyAxisAngle(axisY, rotacionPlanoCorte),
+            cp1
+          )
+        ]
+      });
+    }
+
+    return generatedPlanes;
+  }, [mantos, cp0, cp1]);
 
   const RuledSurface = () => {
-    // Crear líneas y asignar rotación y planos de corte para cada manto
+    const lineas = [];
+
+    const anguloPorManto = 360 / mantos;
+
     for (let i = 0; i < mantos; i++) {
       const rotacion = THREE.MathUtils.degToRad(anguloPorManto * i);
 
