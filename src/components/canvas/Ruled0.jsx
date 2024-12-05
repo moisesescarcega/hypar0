@@ -1,9 +1,8 @@
 import * as THREE from 'three'
 import { useMemo } from 'react'
-// import { Plane } from '@react-three/drei'
 
 export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) {
-  const lineas = []
+  const mantos = 2
   const vAx = -vertexX
   const vAy = vertexZ
   const vAz = 0
@@ -16,29 +15,6 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
   const vDx = 0
   const vDy = -vertexZ
   const vDz = -vertexY
-
-  // Crear líneas rectas para cada segmento
-  for (let n = 1; n <= seg; n++) {
-    const xA = ((vAx - vBx) / seg) * n
-    const yA = (((2 * vBy) / seg) * ((seg - (seg / 2)) - n))
-    const zA = ((vAz - vBz) / seg) * (seg - n)
-
-    const xC = ((vCx - vDx) / seg) * (seg - n)
-    const yC = ((vCy / (seg / 2)) * ((seg - (seg / 2)) - n))
-    const zC = ((vCz - vDz) / seg) * n
-
-    // Definir puntos para la línea actual
-    const puntoUno = new THREE.Vector3(xA, yA, zA)
-    const puntoDos = new THREE.Vector3(xC, yC, zC)
-    const puntos = [puntoUno, puntoDos]
-    
-    // Crear geometría de la línea
-    const lineaDirectriz = new THREE.BufferGeometry().setFromPoints(puntos)
-    
-    // Agregar línea al array
-    // // lineaDirectriz.rotateY(THREE.MathUtils.degToRad(45))
-    lineas.push(lineaDirectriz)
-  }
   
   const puntoInicialUno = new THREE.Vector3(vCx, vCy, vCz)
   const puntoInicialDos = new THREE.Vector3(vDx, vDy, vDz)
@@ -46,42 +22,100 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
   const lineaFinal = new THREE.BufferGeometry().setFromPoints(puntosIniciales)
   const lineaFinal2 = new THREE.BufferGeometry().setFromPoints(puntosIniciales).rotateY(THREE.MathUtils.degToRad(30))
 
-  const planeClip = useMemo(() => {
+  const planeClip0 = useMemo(() => {
     // Asignando valor de ángulo de inclinación de plano de corte vertical central
     const axis = new THREE.Vector3(0, 1, 0)
     const angle = THREE.MathUtils.degToRad(cp0)
-    // Genera un array de planos de corte
-    return [
-      new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axis, -angle), 0),
-      new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axis, angle), 0),
-      new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
-    ]
-  }, [cp0, cp1, clipping])
-  // const PlaneSingle = () => {
-  //   return (
+    // return Array.from({ length: mantos }, (_, i) => {
+    //   const mantoAngle = THREE.MathUtils.degToRad((180 / mantos) * i)
+    //   return new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axis, mantoAngle - angle),0),
+    //   new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axis, mantoAngle - angle),0),
+    //   new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
+    // })
 
-  //     <Plane args={[8, 8]} rotation={[0, THREE.MathUtils.degToRad(-cp0), 0]}>
-  //       <meshBasicMaterial side={THREE.DoubleSide} />
-  //     </Plane>
-  //   )
-  // }
+    // Genera un array de planos de corte
+    for (let p = 1; p < mantos; p++) {
+      return [
+        new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axis, -THREE.MathUtils.degToRad((180 / mantos) * p)), 0),
+        new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axis, THREE.MathUtils.degToRad((180 / mantos) * p)), 0),
+        new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
+      ]
+    }
+    
+    // return [
+    //   new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axis, -angle), 0),
+    //   new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axis, angle), 0),
+    //   new THREE.Plane(new THREE.Vector3(1, 0, 0), cp1)
+    // ]
+  }, [cp0, cp1, clipping])
+
+  const RuledSurface = () => {
+    const lineas = []
+    const planosCorte = []
+
+    // Crear líneas rectas para cada segmento
+    for (let n = 1; n <= seg; n++) {
+      const xA = ((vAx - vBx) / seg) * n
+      const yA = (((2 * vBy) / seg) * ((seg - (seg / 2)) - n))
+      const zA = ((vAz - vBz) / seg) * (seg - n)
+
+      const xC = ((vCx - vDx) / seg) * (seg - n)
+      const yC = ((vCy / (seg / 2)) * ((seg - (seg / 2)) - n))
+      const zC = ((vCz - vDz) / seg) * n
+
+      // Definir puntos para la línea actual
+      const puntoUno = new THREE.Vector3(xA, yA, zA)
+      const puntoDos = new THREE.Vector3(xC, yC, zC)
+      const puntos = [puntoUno, puntoDos]
+      
+      // Arreglo de lineas con rotación para cada número de mantos
+      for (let m = 1; m <= mantos; m++) {
+        const angulo = THREE.MathUtils.degToRad((180 / mantos) * m);
+        const linea = new THREE.BufferGeometry().setFromPoints(puntos).rotateY(angulo);
+        lineas.push({ geometry: linea, clip: m });
+      }
+      // for (let m = 1; m <= mantos; m++) {
+      //   const ang = THREE.MathUtils.degToRad((180 / mantos) * m)
+      //   lineas.push(new THREE.BufferGeometry().setFromPoints(puntos).rotateY(ang))
+      // }
+    }
+    for (let p = 1; p <= mantos; p++){
+      const axis = new THREE.Vector3(0, 1, 0)
+      planosCorte.push(
+        new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(axis, -THREE.MathUtils.degToRad((180 / mantos) * p)), 0),
+        new THREE.Plane(new THREE.Vector3(0, 0, -1).applyAxisAngle(axis, THREE.MathUtils.degToRad((180 / mantos) * p)), 0)
+      )
+    }
+    console.log(lineas[4].clip)
+    return (
+      // Mostrar cada linea de cada segmento para generar la superficie reglada
+      <>
+        {lineas.map((linea, index) => (
+          <line key={index} geometry={linea.geometry}>
+            <lineBasicMaterial
+              color={0x0000ff}
+              linewidth={1}
+              // clippingPlanes={clipping ? [linea.clip] : null}
+              clippingPlanes={clipping ? planosCorte.slice(0 + (linea.clip), 2 + (linea.clip)) : null}
+            />
+          </line>
+        ))}
+      </>
+      // lineas.map((linea, index) => (
+      //   <line key={index} geometry={linea}>
+      //     <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
+      //   </line>
+      // ))
+    
+    )
+  }
 
   return (
     <>
-      {
-        // Mostrar cada linea de cada segmento para generar la superficie reglada
-        lineas.map((linea, index) => (
-          <line key={index} geometry={linea}>
-            <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
-          </line>
-        ))
-      }
-      <line geometry={lineaFinal}>
-        <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
-      </line>
-      <line geometry={lineaFinal2}>
-        <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip : null} />
-      </line>
+      <RuledSurface />
+    <line geometry={lineaFinal}>
+      <lineBasicMaterial color={0x0000ff} linewidth={1} clippingPlanes={clipping ? planeClip0 : null} />
+    </line>
     </>
   )
 }
