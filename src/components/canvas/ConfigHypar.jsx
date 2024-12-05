@@ -1,6 +1,20 @@
-export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY, handleY, vertexZ, handleZ, clipping, handleClipping, clipPlane0, handleCP0, clipPlane1, handleCP1) {
+export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY, handleY, vertexZ, handleZ, nMantos, handleNMantos, clipping, handleClipping, clipPlane0, handleCP0, clipPlane1, handleCP1) {
   return (
     <section className='absolute flex flex-col p-2 m-2 bg-gray-200 rounded-md shadow-md opacity-75 hover:opacity-100 appearance-none z-[9999]'>
+      <div className='flex-row'>
+        <label>Mantos:&nbsp;</label>
+        <input
+          id='rango-mantos'
+          type='range'
+          value={nMantos}
+          onChange={handleNMantos}
+          min='3'
+          max='10'
+          className='h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
+        />
+        <label>{nMantos}</label>
+      </div>
+
       <div className='flex-row'>
         <label>Vértice X:&nbsp;</label>
         <input
@@ -62,8 +76,8 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
           value={clipPlane0}
           onChange={handleCP0}
           min='0'
-          max='90'
-          step='15'
+          max='30'
+          step='1'
           className='h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
         />
         <label>{clipPlane0}°</label>

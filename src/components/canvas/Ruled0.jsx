@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-export function Ruled0({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) {
-  const mantos = 8; // Número de mantos
+export function Ruled0({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0, cp1 }) {
+  // const mantos = 8; // Número de mantos
   const lineas = [];
   const planosCorte = [];
   const axisY = new THREE.Vector3(0, 1, 0);
@@ -24,7 +24,6 @@ export function Ruled0({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) {
   for (let i = 0; i < mantos; i++) {
     const rotacion = THREE.MathUtils.degToRad((anguloPorManto * i) + medioAnguloPorManto);
     const rotacionPlanoCorte = THREE.MathUtils.degToRad(((anguloPorManto * i) + 90) );
-    console.log(rotacionPlanoCorte)
     planosCorte.push({
       nplane: i + 1,
       cplane: [
