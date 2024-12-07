@@ -106,7 +106,7 @@ export function ConfigHypar (segments, handleSegments, vertexX, handleX, vertexY
           value={segments}
           onChange={handleSegments}
           min='3'
-          max='300'
+          max='150'
           className='h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
         />
         <label>{segments}</label>

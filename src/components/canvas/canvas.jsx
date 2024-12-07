@@ -5,7 +5,7 @@ import { ConfigHypar } from './ConfigHypar'
 import { Ruled0 } from './Ruled0'
 
 export const Canvasapp = () => {
-  const [segments, setSegments] = useState(120)
+  const [segments, setSegments] = useState(60)
   const [vertX, setVertX] = useState(20)
   const [vertY, setVertY] = useState(10)
   const [vertZ, setVertZ] = useState(28)
@@ -13,24 +13,24 @@ export const Canvasapp = () => {
   const [clipping, setClipping] = useState(true)
   const [clipPlane0, setClipPlane0] = useState(8)
   const [clipPlane1, setClipPlane1] = useState(5)
-  const [rotationEnabled, setRotationEnabled] = useState(true); // Control del giro automático
-  const [lastInteraction, setLastInteraction] = useState(Date.now()); // Tiempo de última interacción
+  const [rotationEnabled, setRotationEnabled] = useState(true) // Control del giro automático
+  const [lastInteraction, setLastInteraction] = useState(Date.now()) // Tiempo de última interacción
 
   const handleInteraction = () => {
-    setRotationEnabled(false);
-    setLastInteraction(Date.now());
-  };
+    setRotationEnabled(false)
+    setLastInteraction(Date.now())
+  }
 
   // Reanudar rotación después de 2 segundos de inactividad
   useEffect(() => {
     const interval = setInterval(() => {
       if (!rotationEnabled && Date.now() - lastInteraction > 3500) {
-        setRotationEnabled(true);
+        setRotationEnabled(true)
       }
-    }, 500);
+    }, 500)
 
-    return () => clearInterval(interval);
-  }, [rotationEnabled, lastInteraction]);
+    return () => clearInterval(interval)
+  }, [rotationEnabled, lastInteraction])
 
   const sizeGrid = vertX
   const handleSegments = (e) => {
@@ -60,22 +60,22 @@ export const Canvasapp = () => {
 
   // Componente para manejar la rotación de la cámara
   const RotatingCamera = ({ rotationEnabled }) => {
-    const cameraRef = useRef();
+    const cameraRef = useRef()
 
     useFrame(({ camera }) => {
       if (rotationEnabled) {
-        cameraRef.current = camera;
-        const rotationSpeed = 0.00005; // Velocidad de rotación
-        const radius = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2);
-        const time = performance.now() * rotationSpeed;
-        camera.position.x = radius * Math.sin(time);
-        camera.position.z = radius * Math.cos(time);
-        camera.lookAt(0, 0, 0); // La cámara siempre mira al centro
+        cameraRef.current = camera
+        const rotationSpeed = 0.00005 // Velocidad de rotación
+        const radius = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2)
+        const time = performance.now() * rotationSpeed
+        camera.position.x = radius * Math.sin(time)
+        camera.position.z = radius * Math.cos(time)
+        camera.lookAt(0, 0, 0) // La cámara siempre mira al centro
       }
-    });
+    })
 
-    return null;
-  };
+    return null
+  }
 
   return (
     <div className='static' onClick={handleInteraction} onTouchStart={handleInteraction}>

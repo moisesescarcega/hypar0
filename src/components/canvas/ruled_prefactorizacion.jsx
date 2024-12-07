@@ -5,11 +5,11 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
   const mantos = 3
   const lineas = []
   const planosCorte = []
-  const vAx = -vertexX, vAy = vertexZ, vAz = 0
-  const vBx = 0, vBy = -vertexZ, vBz = vertexY
-  const vCx = vertexX, vCy = vertexZ, vCz = 0
-  const vDx = 0, vDy = -vertexZ, vDz = -vertexY
-  
+  const vAx = -vertexX; const vAy = vertexZ; const vAz = 0
+  const vBx = 0; const vBy = -vertexZ; const vBz = vertexY
+  const vCx = vertexX; const vCy = vertexZ; const vCz = 0
+  const vDx = 0; const vDy = -vertexZ; const vDz = -vertexY
+
   const puntoInicialUno = new THREE.Vector3(vCx, vCy, vCz)
   const puntoInicialDos = new THREE.Vector3(vDx, vDy, vDz)
   const puntosIniciales = [puntoInicialUno, puntoInicialDos]
@@ -27,7 +27,7 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
       ]
     }
   )
-  
+
   const RuledSurface = () => {
     const angulo = THREE.MathUtils.degToRad((180 / mantos) * 1)
     // Crear líneas rectas para cada segmento
@@ -44,11 +44,10 @@ export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, clipping, cp0, cp1 }) 
       const puntoUno = new THREE.Vector3(xA, yA, zA)
       const puntoDos = new THREE.Vector3(xC, yC, zC)
       const puntos = [puntoUno, puntoDos]
-      
+
       // Arreglo de lineas con rotación para cada número de mantos
       const linea = new THREE.BufferGeometry().setFromPoints(puntos).rotateY(angulo)
       lineas.push({ geometry: linea, clip: 1 })
-      
     }
     const lineaFinal = new THREE.BufferGeometry().setFromPoints(puntosIniciales).rotateY(angulo)
     lineas.push({ geometry: lineaFinal, clip: 1 })
