@@ -1,8 +1,7 @@
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 
 export function Ruled0 ({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0, cp1 }) {
-  const meshRef = useRef()
   const axisY = new THREE.Vector3(0, 1, 0)
 
   // Coordenadas base
