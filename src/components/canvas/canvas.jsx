@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect, useRef } from 'react'
+import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, Html } from '@react-three/drei'
 import { ConfigHypar } from './ConfigHypar'
@@ -15,6 +15,64 @@ export const Canvasapp = () => {
   const [clipPlane1, setClipPlane1] = useState(5)
   const [rotationEnabled, setRotationEnabled] = useState(true) // Control del giro automático
   const [lastInteraction, setLastInteraction] = useState(Date.now()) // Tiempo de última interacción
+
+  // Definir las diferentes configuraciones
+  const configurations = [
+    { nMantos: 4, vertX: 20, vertY: 10, vertZ: 28, clipPlane0: 8, clipPlane1: 5 },
+    { nMantos: 6, vertX: 30, vertY: 15, vertZ: 35, clipPlane0: 15, clipPlane1: 10 },
+    { nMantos: 8, vertX: 25, vertY: 20, vertZ: 40, clipPlane0: 20, clipPlane1: 15 },
+    { nMantos: 3, vertX: 15, vertY: 25, vertZ: 30, clipPlane0: 10, clipPlane1: 8 }
+  ]
+
+  const [configIndex, setConfigIndex] = useState(0)
+
+  // Función para actualizar los estados gradualmente
+  const animateToNewValues = useCallback((targetConfig) => {
+    const steps = 60 // Número de pasos para la animación
+    const duration = 2000 // Duración de la animación en ms
+    const stepDuration = duration / steps
+
+    let currentStep = 0
+
+    const initialValues = {
+      nMantos: nMantos,
+      vertX: vertX,
+      vertY: vertY,
+      vertZ: vertZ,
+      clipPlane0: clipPlane0,
+      clipPlane1: clipPlane1
+    }
+
+    const animate = () => {
+      currentStep++
+      const progress = currentStep / steps
+
+      // Interpolación lineal para cada valor
+      setNMantos(Math.round(initialValues.nMantos + (targetConfig.nMantos - initialValues.nMantos) * progress))
+      setVertX(Math.round(initialValues.vertX + (targetConfig.vertX - initialValues.vertX) * progress))
+      setVertY(Math.round(initialValues.vertY + (targetConfig.vertY - initialValues.vertY) * progress))
+      setVertZ(Math.round(initialValues.vertZ + (targetConfig.vertZ - initialValues.vertZ) * progress))
+      setClipPlane0(initialValues.clipPlane0 + (targetConfig.clipPlane0 - initialValues.clipPlane0) * progress)
+      setClipPlane1(initialValues.clipPlane1 + (targetConfig.clipPlane1 - initialValues.clipPlane1) * progress)
+
+      if (currentStep < steps) {
+        setTimeout(animate, stepDuration)
+      }
+    }
+
+    animate()
+  }, [nMantos, vertX, vertY, vertZ, clipPlane0, clipPlane1])
+
+  // Efecto para cambiar la configuración cada 5 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextIndex = (configIndex + 1) % configurations.length
+      setConfigIndex(nextIndex)
+      animateToNewValues(configurations[nextIndex])
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [configIndex, animateToNewValues])
 
   const handleInteraction = () => {
     setRotationEnabled(false)
@@ -65,7 +123,7 @@ export const Canvasapp = () => {
     useFrame(({ camera }) => {
       if (rotationEnabled) {
         cameraRef.current = camera
-        const rotationSpeed = 0.00005 // Velocidad de rotación
+        const rotationSpeed = 0.00005 // Velocidad de rotaci��n
         const radius = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2)
         const time = performance.now() * rotationSpeed
         camera.position.x = radius * Math.sin(time)
