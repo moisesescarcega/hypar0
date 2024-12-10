@@ -171,7 +171,7 @@ export const Canvasapp = () => {
         configurations[configIndex].hypar
       )}
       <Canvas 
-        camera={{ position: [-15, 12.5, 15], fov: 35 }} 
+        camera={{ position: [-25, 18.5, 25], fov: 50 }} 
         className='z-30' 
         onCreated={(state) => {
           state.gl.localClippingEnabled = true
