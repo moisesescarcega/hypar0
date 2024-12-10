@@ -3,9 +3,9 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, Html } from '@react-three/drei'
 import { ConfigHypar } from './ConfigHypar'
 import { Ruled0 } from './Ruled0'
-
+import * as THREE from 'three'
 export const Canvasapp = () => {
-  const [segments, setSegments] = useState(60)
+  const [segments, setSegments] = useState(80)
   const [vertX, setVertX] = useState(20)
   const [vertY, setVertY] = useState(10)
   const [vertZ, setVertZ] = useState(28)
@@ -15,21 +15,22 @@ export const Canvasapp = () => {
   const [clipPlane1, setClipPlane1] = useState(5)
   const [rotationEnabled, setRotationEnabled] = useState(true) // Control del giro automático
   const [lastInteraction, setLastInteraction] = useState(Date.now()) // Tiempo de última interacción
+  const [configurable, setConfigurable] = useState(false)
 
   // Definir las diferentes configuraciones
   const configurations = [
-    { nMantos: 4, vertX: 20, vertY: 10, vertZ: 28, clipPlane0: 8, clipPlane1: 5 },
-    { nMantos: 6, vertX: 30, vertY: 15, vertZ: 35, clipPlane0: 15, clipPlane1: 10 },
-    { nMantos: 8, vertX: 25, vertY: 20, vertZ: 40, clipPlane0: 20, clipPlane1: 15 },
-    { nMantos: 3, vertX: 15, vertY: 25, vertZ: 30, clipPlane0: 10, clipPlane1: 8 }
+    { hypar: 'Pabellón Oslo', nMantos: 3, vertX: 22, vertY: 14, vertZ: 26, clipPlane0: 16, clipPlane1: 5 },
+    { hypar: 'Casino de la Selva', nMantos: 5, vertX: 30, vertY: 10, vertZ: 27, clipPlane0: 25, clipPlane1: 7.5 },
+    { hypar: 'San Antonio de las Huertas', nMantos: 4, vertX: 30, vertY: 14, vertZ: 43, clipPlane0: 0, clipPlane1: 9 },
+    { hypar: 'Manantiales', nMantos: 8, vertX: 37, vertY: 9, vertZ: 26, clipPlane0: 19, clipPlane1: 12 }
   ]
 
   const [configIndex, setConfigIndex] = useState(0)
 
   // Función para actualizar los estados gradualmente
   const animateToNewValues = useCallback((targetConfig) => {
-    const steps = 60 // Número de pasos para la animación
-    const duration = 2000 // Duración de la animación en ms
+    const steps = 30 // Número de pasos para la animación
+    const duration = 700 // Duración de la animación en ms
     const stepDuration = duration / steps
 
     let currentStep = 0
@@ -65,14 +66,17 @@ export const Canvasapp = () => {
 
   // Efecto para cambiar la configuración cada 5 segundos
   useEffect(() => {
-    const interval = setInterval(() => {
-      const nextIndex = (configIndex + 1) % configurations.length
-      setConfigIndex(nextIndex)
-      animateToNewValues(configurations[nextIndex])
-    }, 5000)
+    let interval
+    if (!configurable) {
+      interval = setInterval(() => {
+        const nextIndex = (configIndex + 1) % configurations.length
+        setConfigIndex(nextIndex)
+        animateToNewValues(configurations[nextIndex])
+      }, 5000)
+    }
 
     return () => clearInterval(interval)
-  }, [configIndex, animateToNewValues])
+  }, [configIndex, animateToNewValues, configurable])
 
   const handleInteraction = () => {
     setRotationEnabled(false)
@@ -123,7 +127,7 @@ export const Canvasapp = () => {
     useFrame(({ camera }) => {
       if (rotationEnabled) {
         cameraRef.current = camera
-        const rotationSpeed = 0.00005 // Velocidad de rotaci��n
+        const rotationSpeed = 0.00005 // Velocidad de rotación
         const radius = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2)
         const time = performance.now() * rotationSpeed
         camera.position.x = radius * Math.sin(time)
@@ -135,15 +139,51 @@ export const Canvasapp = () => {
     return null
   }
 
+  // Manejador para el checkbox de configuración
+  const handleConfigurable = (e) => {
+    const isConfigurable = e.target.checked
+    setConfigurable(isConfigurable)
+    
+    if (!isConfigurable) {
+      // Resetear a valores iniciales
+      setNMantos(configurations[0].nMantos)
+      setVertX(configurations[0].vertX)
+      setVertY(configurations[0].vertY)
+      setVertZ(configurations[0].vertZ)
+      setClipPlane0(configurations[0].clipPlane0)
+      setClipPlane1(configurations[0].clipPlane1)
+      setConfigIndex(0)
+    }
+  }
+
   return (
     <div className='static' onClick={handleInteraction} onTouchStart={handleInteraction}>
-      {ConfigHypar(segments, handleSegments, vertX, handleX, vertY, handleY, vertZ, handleZ, nMantos, handleNMantos, clipping, handleClipping, clipPlane0, handleCP0, clipPlane1, handleCP1)}
-      <Canvas camera={{ position: [-15, 12.5, 15], fov: 35 }} className='z-30' onCreated={(state) => (state.gl.localClippingEnabled = true)}>
+      {ConfigHypar(
+        segments, handleSegments, 
+        vertX, handleX, 
+        vertY, handleY, 
+        vertZ, handleZ, 
+        nMantos, handleNMantos, 
+        clipping, handleClipping, 
+        clipPlane0, handleCP0, 
+        clipPlane1, handleCP1,
+        configurable, handleConfigurable,
+        configurations[configIndex].hypar
+      )}
+      <Canvas 
+        camera={{ position: [-15, 12.5, 15], fov: 35 }} 
+        className='z-30' 
+        onCreated={(state) => {
+          state.gl.localClippingEnabled = true
+          
+          state.scene.background = new THREE.Color('#E1E2E9')
+        }}
+      >
         <Suspense fallback={<Html center>...cargando</Html>}>
           <ambientLight intensity={Math.PI / 8} />
           <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
           <OrbitControls makeDefault dampingFactor={0.3} />
-          <Environment preset='sunset' />
+          {/* <Environment preset='sunset' /> */}
           <RotatingCamera rotationEnabled={rotationEnabled} />
 
           {/* Rejilla de base TODO: agregar useState dentro de HandleX y HandleY para actualizar sizeGrid */}
