@@ -131,8 +131,8 @@ export function ConfigHypar (
             type='range'
             value={segments}
             onChange={handleSegments}
-            min='3'
-            max='150'
+            min='4'
+            max='300'
             className='w-auto h-2 mx-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
           />
           <label className='w-12 text-right'>{segments}</label>

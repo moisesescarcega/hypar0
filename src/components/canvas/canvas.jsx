@@ -1,8 +1,8 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Environment, Html } from '@react-three/drei'
+import { OrbitControls, Environment, Html, Segments, Segment } from '@react-three/drei'
 import { ConfigHypar } from './ConfigHypar'
-import { Ruled0 } from './Ruled0'
+import { Ruled1 } from './Ruled1'
 import * as THREE from 'three'
 export const Canvasapp = () => {
   const [segments, setSegments] = useState(80)
@@ -27,6 +27,22 @@ export const Canvasapp = () => {
 
   const [configIndex, setConfigIndex] = useState(0)
 
+  // const LineaPrueba = () => {
+  //   const axisY = new THREE.Vector3(1, 10, 1)
+  //   return (
+  //     <group rotation={[Math.PI / 4, 0, 0]}>
+  //       <Segments limit={5000} lineWidth={2} color={'#ff0000'}>
+  //         {[...Array(5000)].map((_, i) => (
+  //           <Segment 
+  //             key={i}
+  //             start={[0 + (0.1 * i), 0, 0 + (0.1 * i)]} 
+  //             end={[50 + (0.1 * i), 50, 50 + (0.1 * i)]}
+  //           />
+  //         ))}
+  //       </Segments>
+  //     </group>
+  //   )
+  // }
   // Función para actualizar los estados gradualmente
   const animateToNewValues = useCallback((targetConfig) => {
     const steps = 30 // Número de pasos para la animación
@@ -185,11 +201,11 @@ export const Canvasapp = () => {
           <OrbitControls makeDefault dampingFactor={0.3} />
           {/* <Environment preset='sunset' /> */}
           <RotatingCamera rotationEnabled={rotationEnabled} />
-
+          {/* <LineaPrueba /> */}
           {/* Rejilla de base TODO: agregar useState dentro de HandleX y HandleY para actualizar sizeGrid */}
           {/* <gridHelper args={[(vertX > vertY ? vertX : vertY), (vertX > vertY ? vertX : vertY), 0xff0000, 'teal']} /> */}
           {/* Componente de Hypar con los params X, Y y Z */}
-          <Ruled0 seg={segments} vertexX={vertX} vertexY={vertY} vertexZ={vertZ} mantos={nMantos} clipping={clipping} cp0={clipPlane0} cp1={clipPlane1} />
+          <Ruled1 seg={segments} vertexX={vertX} vertexY={vertY} vertexZ={vertZ} mantos={nMantos} clipping={clipping} cp0={clipPlane0} cp1={clipPlane1} />
         </Suspense>
       </Canvas>
     </div>
