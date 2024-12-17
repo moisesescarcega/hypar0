@@ -1,34 +1,28 @@
-# Astro Starter Kit: Blog
+# Cascarones de concreto: Bordes curvos
 
-```sh
-npm create astro@latest -- --template blog
-```
+## Aplicación creativa del paraboloide hiperbólico
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/blog)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/blog)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/blog/devcontainer.json)
+Visualización interactiva de algunas de las obras del arquitecto Félix Candela.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+El actual repositorio es una aplicación web que permite visualizar y interactuar con algunas de las obras del arquitecto Félix Candela. Está elaborada con Astro, React, Three.js y Tailwind CSS. En constante desarrollo.
 
-![blog](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+Los componentes para poder configurar la aplicación se encuentran en el directorio `src/components/canvas/`. 
 
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
+La estructura del proyecto es la siguiente:
 ```text
 ├── public/
 ├── src/
 │   ├── components/
+│   │   ├── canvas/
+│   │   │   ├── ConfigHypar.jsx  ...Interfaz de uso
+│   │   │   ├── NurbsSurface.jsx ...Superficie NURBS
+│   │   │   ├── QuadraticB.jsx ...Superficie cuadrática
+│   │   │   ├── Ruled1.jsx ...Superficie reglada
+│   │   │   ├── SurfaceNurbs.jsx ...Superficie NURBS
+│   │   │   ├── canvas.jsx ...Componente principal
+│   │   ├── Footer.astro ...Pie de página
+│   │   ├── Header.astro ...Encabezado
+│   │   ├── BaseHead.astro ...Encabezado de la página
 │   ├── content/
 │   ├── layouts/
 │   └── pages/
@@ -64,5 +58,8 @@ All commands are run from the root of the project, from a terminal:
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
 
 ## Credit
+
+Project created by Moisés Escárcega for the exhibition "Félix Candela: Fonction, forme et élegance des coques en beton".
+Universidad Nacional Autónoma de México, Facultad de Arquitectura.
 
 This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
