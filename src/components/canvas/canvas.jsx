@@ -1,21 +1,25 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Environment, Html, Segments, Segment } from '@react-three/drei'
+import { OrbitControls, Environment, Html } from '@react-three/drei'
 import { ConfigHypar } from './ConfigHypar'
 import { Ruled1 } from './Ruled1'
+import { QuadraticB } from './QuadraticB'
+import { NurbsSurface } from './SurfaceNurbs'
 import * as THREE from 'three'
+
 export const Canvasapp = () => {
   const [segments, setSegments] = useState(80)
-  const [vertX, setVertX] = useState(20)
-  const [vertY, setVertY] = useState(10)
-  const [vertZ, setVertZ] = useState(28)
-  const [nMantos, setNMantos] = useState(4)
+  const [vertX, setVertX] = useState(22)
+  const [vertY, setVertY] = useState(14)
+  const [vertZ, setVertZ] = useState(26)
+  const [nMantos, setNMantos] = useState(3)
   const [clipping, setClipping] = useState(true)
-  const [clipPlane0, setClipPlane0] = useState(8)
+  const [clipPlane0, setClipPlane0] = useState(16)
   const [clipPlane1, setClipPlane1] = useState(5)
   const [rotationEnabled, setRotationEnabled] = useState(true) // Control del giro automático
   const [lastInteraction, setLastInteraction] = useState(Date.now()) // Tiempo de última interacción
   const [configurable, setConfigurable] = useState(false)
+  const [key, setKey] = useState(0) // Agregamos estado para forzar el remontaje
 
   // Definir las diferentes configuraciones
   const configurations = [
@@ -27,29 +31,18 @@ export const Canvasapp = () => {
 
   const [configIndex, setConfigIndex] = useState(0)
 
-  // const LineaPrueba = () => {
-  //   const axisY = new THREE.Vector3(1, 10, 1)
-  //   return (
-  //     <group rotation={[Math.PI / 4, 0, 0]}>
-  //       <Segments limit={5000} lineWidth={2} color={'#ff0000'}>
-  //         {[...Array(5000)].map((_, i) => (
-  //           <Segment 
-  //             key={i}
-  //             start={[0 + (0.1 * i), 0, 0 + (0.1 * i)]} 
-  //             end={[50 + (0.1 * i), 50, 50 + (0.1 * i)]}
-  //           />
-  //         ))}
-  //       </Segments>
-  //     </group>
-  //   )
-  // }
+  // Función para forzar el remontaje
+  const remountRuled = useCallback(() => {
+    setKey(prevKey => prevKey + 1)
+  }, [])
+
   // Función para actualizar los estados gradualmente
   const animateToNewValues = useCallback((targetConfig) => {
-    const steps = 30 // Número de pasos para la animación
-    const duration = 700 // Duración de la animación en ms
+    const steps = 30 // Reducimos los pasos de 60 a 30
+    const duration = 150 // Reducimos la duración de 200ms a 150ms
     const stepDuration = duration / steps
-
     let currentStep = 0
+    let animationFrameId
 
     const initialValues = {
       nMantos: nMantos,
@@ -62,9 +55,10 @@ export const Canvasapp = () => {
 
     const animate = () => {
       currentStep++
-      const progress = currentStep / steps
+      // Usamos una función de easing para suavizar la transición
+      const progress = easeInOutCubic(currentStep / steps)
 
-      // Interpolación lineal para cada valor
+      // Interpolación con la función de easing
       setNMantos(Math.round(initialValues.nMantos + (targetConfig.nMantos - initialValues.nMantos) * progress))
       setVertX(Math.round(initialValues.vertX + (targetConfig.vertX - initialValues.vertX) * progress))
       setVertY(Math.round(initialValues.vertY + (targetConfig.vertY - initialValues.vertY) * progress))
@@ -72,13 +66,29 @@ export const Canvasapp = () => {
       setClipPlane0(initialValues.clipPlane0 + (targetConfig.clipPlane0 - initialValues.clipPlane0) * progress)
       setClipPlane1(initialValues.clipPlane1 + (targetConfig.clipPlane1 - initialValues.clipPlane1) * progress)
 
+      // Forzar remontaje en cada paso de la animación
+      remountRuled()
+
       if (currentStep < steps) {
-        setTimeout(animate, stepDuration)
+        animationFrameId = requestAnimationFrame(() => setTimeout(animate, stepDuration))
       }
     }
 
+    // Función de easing cúbica
+    const easeInOutCubic = (x) => {
+      return x < 0.5 
+        ? 4 * x * x * x 
+        : 1 - Math.pow(-2 * x + 2, 3) / 2
+    }
+
     animate()
-  }, [nMantos, vertX, vertY, vertZ, clipPlane0, clipPlane1])
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [nMantos, vertX, vertY, vertZ, clipPlane0, clipPlane1, remountRuled])
 
   // Efecto para cambiar la configuración cada 5 segundos
   useEffect(() => {
@@ -99,10 +109,10 @@ export const Canvasapp = () => {
     setLastInteraction(Date.now())
   }
 
-  // Reanudar rotación después de 2 segundos de inactividad
+  // Reanudar rotación después de 5 segundos de inactividad
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!rotationEnabled && Date.now() - lastInteraction > 3500) {
+      if (!rotationEnabled && Date.now() - lastInteraction > 5000) {
         setRotationEnabled(true)
       }
     }, 500)
@@ -110,7 +120,6 @@ export const Canvasapp = () => {
     return () => clearInterval(interval)
   }, [rotationEnabled, lastInteraction])
 
-  const sizeGrid = vertX
   const handleSegments = (e) => {
     setSegments(e.target.value)
   }
@@ -172,6 +181,20 @@ export const Canvasapp = () => {
     }
   }
 
+  // Limpieza de recursos
+  useEffect(() => {
+    return () => {
+      // Limpiar texturas y materiales al desmontar
+      THREE.Cache.clear()
+      
+      // Limpiar el renderizador
+      const renderer = document.querySelector('canvas')?.getContext('webgl')
+      if (renderer) {
+        renderer.getExtension('WEBGL_lose_context')?.loseContext()
+      }
+    }
+  }, [])
+
   return (
     <div className='static' onClick={handleInteraction} onTouchStart={handleInteraction}>
       {ConfigHypar(
@@ -199,13 +222,33 @@ export const Canvasapp = () => {
           <ambientLight intensity={Math.PI / 8} />
           <spotLight intensity={Math.PI} decay={0} angle={0.2} castShadow position={[5, 2.5, 5]} shadow-mapSize={128} />
           <OrbitControls makeDefault dampingFactor={0.3} />
-          {/* <Environment preset='sunset' /> */}
+          <Environment preset='sunset' />
           <RotatingCamera rotationEnabled={rotationEnabled} />
-          {/* <LineaPrueba /> */}
-          {/* Rejilla de base TODO: agregar useState dentro de HandleX y HandleY para actualizar sizeGrid */}
-          {/* <gridHelper args={[(vertX > vertY ? vertX : vertY), (vertX > vertY ? vertX : vertY), 0xff0000, 'teal']} /> */}
-          {/* Componente de Hypar con los params X, Y y Z */}
-          <Ruled1 seg={segments} vertexX={vertX} vertexY={vertY} vertexZ={vertZ} mantos={nMantos} clipping={clipping} cp0={clipPlane0} cp1={clipPlane1} />
+          {/* <NurbsSurface 
+            vertX={vertX}
+            vertY={vertY}
+            vertZ={vertZ}
+            mantos={nMantos}
+            cp0={clipPlane0}
+            cp1={clipPlane1}
+          /> */}
+          {/* <QuadraticB 
+            segments={segments}
+            vertX={vertX}
+            vertY={vertY}
+            vertZ={vertZ}
+          /> */}
+          <Ruled1 
+            key={key}
+            seg={segments} 
+            vertexX={vertX} 
+            vertexY={vertY} 
+            vertexZ={vertZ} 
+            mantos={nMantos} 
+            clipping={clipping} 
+            cp0={clipPlane0} 
+            cp1={clipPlane1} 
+          />
         </Suspense>
       </Canvas>
     </div>
