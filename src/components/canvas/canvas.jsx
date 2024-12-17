@@ -19,6 +19,7 @@ export const Canvasapp = () => {
   const [rotationEnabled, setRotationEnabled] = useState(true) // Control del giro automático
   const [lastInteraction, setLastInteraction] = useState(Date.now()) // Tiempo de última interacción
   const [configurable, setConfigurable] = useState(false)
+  const [showSurface, setShowSurface] = useState(false)
   const [key, setKey] = useState(0) // Agregamos estado para forzar el remontaje
 
   // Definir las diferentes configuraciones
@@ -45,12 +46,12 @@ export const Canvasapp = () => {
     let animationFrameId
 
     const initialValues = {
-      nMantos: nMantos,
-      vertX: vertX,
-      vertY: vertY,
-      vertZ: vertZ,
-      clipPlane0: clipPlane0,
-      clipPlane1: clipPlane1
+      nMantos,
+      vertX,
+      vertY,
+      vertZ,
+      clipPlane0,
+      clipPlane1
     }
 
     const animate = () => {
@@ -76,8 +77,8 @@ export const Canvasapp = () => {
 
     // Función de easing cúbica
     const easeInOutCubic = (x) => {
-      return x < 0.5 
-        ? 4 * x * x * x 
+      return x < 0.5
+        ? 4 * x * x * x
         : 1 - Math.pow(-2 * x + 2, 3) / 2
     }
 
@@ -166,9 +167,9 @@ export const Canvasapp = () => {
 
   // Manejador para el checkbox de configuración
   const handleConfigurable = (e) => {
-    const isConfigurable = e.target.checked
+    const isConfigurable = !configurable
     setConfigurable(isConfigurable)
-    
+
     if (!isConfigurable) {
       // Resetear a valores iniciales
       setNMantos(configurations[0].nMantos)
@@ -180,13 +181,16 @@ export const Canvasapp = () => {
       setConfigIndex(0)
     }
   }
+  const handleShowSurface = (e) => {
+    setShowSurface(!showSurface)
+  }
 
   // Limpieza de recursos
   useEffect(() => {
     return () => {
       // Limpiar texturas y materiales al desmontar
       THREE.Cache.clear()
-      
+
       // Limpiar el renderizador
       const renderer = document.querySelector('canvas')?.getContext('webgl')
       if (renderer) {
@@ -198,23 +202,24 @@ export const Canvasapp = () => {
   return (
     <div className='static' onClick={handleInteraction} onTouchStart={handleInteraction}>
       {ConfigHypar(
-        segments, handleSegments, 
-        vertX, handleX, 
-        vertY, handleY, 
-        vertZ, handleZ, 
-        nMantos, handleNMantos, 
-        clipping, handleClipping, 
-        clipPlane0, handleCP0, 
+        segments, handleSegments,
+        vertX, handleX,
+        vertY, handleY,
+        vertZ, handleZ,
+        nMantos, handleNMantos,
+        clipping, handleClipping,
+        clipPlane0, handleCP0,
         clipPlane1, handleCP1,
         configurable, handleConfigurable,
+        showSurface, handleShowSurface,
         configurations[configIndex].hypar
       )}
-      <Canvas 
-        camera={{ position: [-25, 18.5, 25], fov: 50 }} 
-        className='z-30' 
+      <Canvas
+        camera={{ position: [-25, 18.5, 25], fov: 50 }}
+        className='z-30'
         onCreated={(state) => {
           state.gl.localClippingEnabled = true
-          
+
           state.scene.background = new THREE.Color('#E1E2E9')
         }}
       >
@@ -224,31 +229,35 @@ export const Canvasapp = () => {
           <OrbitControls makeDefault dampingFactor={0.3} />
           <Environment preset='sunset' />
           <RotatingCamera rotationEnabled={rotationEnabled} />
-          {/* <NurbsSurface 
-            vertX={vertX}
-            vertY={vertY}
-            vertZ={vertZ}
-            mantos={nMantos}
-            cp0={clipPlane0}
-            cp1={clipPlane1}
-          /> */}
-          {/* <QuadraticB 
+          {/* <QuadraticB
             segments={segments}
             vertX={vertX}
             vertY={vertY}
             vertZ={vertZ}
           /> */}
-          <Ruled1 
-            key={key}
-            seg={segments} 
-            vertexX={vertX} 
-            vertexY={vertY} 
-            vertexZ={vertZ} 
-            mantos={nMantos} 
-            clipping={clipping} 
-            cp0={clipPlane0} 
-            cp1={clipPlane1} 
-          />
+          {showSurface ? (
+            <NurbsSurface
+              key={key}
+              vertX={vertX}
+              vertY={vertY}
+              vertZ={vertZ}
+              mantos={nMantos}
+              cp0={clipPlane0}
+              cp1={clipPlane1}
+            />
+          ) : (
+            <Ruled1
+              key={key}
+              seg={segments}
+              vertexX={vertX}
+              vertexY={vertY}
+              vertexZ={vertZ}
+              mantos={nMantos}
+              clipping={clipping}
+              cp0={clipPlane0}
+              cp1={clipPlane1}
+            />
+          )}
         </Suspense>
       </Canvas>
     </div>

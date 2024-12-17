@@ -1,12 +1,12 @@
-import { Segments, Segment } from '@react-three/drei';
+import { Segments, Segment } from '@react-three/drei'
 import { useMemo, useRef, useEffect } from 'react'
-import { planosDeCorte } from './planosDeCorte';
+import { planosDeCorte } from './planosDeCorte'
 import * as THREE from 'three'
 
 export function Ruled1 ({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0, cp1 }) {
   const segmentsRef = useRef()
   const lineasRef = useRef([])
-  
+
   // Limpieza de geometrías y materiales
   useEffect(() => {
     return () => {
@@ -33,12 +33,13 @@ export function Ruled1 ({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0,
     { x: 0, y: -vertexZ, z: vertexY },
     { x: vertexX, y: vertexZ, z: 0 },
     { x: 0, y: -vertexZ, z: -vertexY }
-  ], [vertexX, vertexY, vertexZ]);
+  ], [vertexX, vertexY, vertexZ])
+  
   // Generar planos de corte usando useMemo
   const planosCorte = useMemo(() => {
     return planosDeCorte(mantos, cp0, cp1)
   }, [mantos, cp0, cp1])
-  
+
   // Memoización de líneas generadas
   const generatedLineas = useMemo(() => {
     const lines = []
@@ -67,22 +68,21 @@ export function Ruled1 ({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0,
 
   const RuledSurface = () => {
     const anguloPorManto = 360 / mantos
-
     if (clipping) {
       return (
         <>
           {Array.from({ length: mantos }).map((_, i) => (
-            <group 
-              key={i} 
+            <group
+              key={i}
               rotation-y={THREE.MathUtils.degToRad(anguloPorManto * i)}
               ref={(el) => {
                 if (el) segmentsRef.current = el
               }}
             >
-              <Segments 
-                limit={400} 
-                lineWidth={1} 
-                color={'#193d6b'} 
+              <Segments
+                limit={400}
+                lineWidth={1}
+                color='#193d6b'
                 clippingPlanes={planosCorte[i].cplane}
               >
                 {lineasRef.current.map((linea, index) => (
@@ -101,8 +101,9 @@ export function Ruled1 ({ seg, vertexX, vertexY, vertexZ, mantos, clipping, cp0,
       return (
         <group ref={(el) => {
           if (el) segmentsRef.current = el
-        }}>
-          <Segments limit={400} lineWidth={1} color={'#0000ff'}>
+        }}
+        >
+          <Segments limit={400} lineWidth={1} color='#0000ff'>
             {lineasRef.current.slice(0, seg).map((linea, index) => (
               <Segment
                 key={index}

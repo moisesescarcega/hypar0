@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-export function planosDeCorte(mantos, cp0, cp1) {
+export function planosDeCorte (mantos, cp0, cp1) {
   const axisY = new THREE.Vector3(0, 1, 0)
   const anguloPorManto = 360 / mantos
   const medioAnguloPorManto = 180 / mantos
